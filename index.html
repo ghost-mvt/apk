@@ -10,9 +10,9 @@
     <ul id="fileList">جارٍ تحميل الملفات...</ul>
 
     <script>
-        const username = 'ghost-mvt'; // ضع اسم المستخدم الخاص بك على GitHub هنا
-        const repo = 'apk'; // ضع اسم المستودع هنا
-        const folder = 'apk'; // ضع اسم المجلد الذي يحتوي على الملفات هنا
+        const username = 'ghost-mvt'; // اسم المستخدم الخاص بك على GitHub
+        const repo = 'apk'; // اسم المستودع
+        const folder = ''; // اتركه فارغًا إذا كانت الملفات داخل المستودع مباشرة
 
         async function fetchFiles() {
             const response = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${folder}`);
