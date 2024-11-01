@@ -114,7 +114,7 @@
 
         <form id="customerForm" class="hidden">
             <input type="text" id="carPlate" placeholder="Araç Plakası" oninput="validateCarPlate(this)" required>
-            <input type="text" id="mileage" placeholder="Kilometre Sayısı" pattern="^\d{6}$" required>
+            <input type="text" id="mileage" placeholder="Kilometre Sayısı (00,000 veya 000,000)" oninput="formatMileage(this)" required>
             <select id="maintenanceOptions" multiple required>
                 <option value="Motor Yağı">Motor Yağı</option>
                 <option value="Yağ Filtresi">Yağ Filtresi</option>
@@ -160,6 +160,14 @@
             input.value = input.value.replace(regex, '').toUpperCase(); 
         }
 
+        // Kilometre formatlama fonksiyonu
+        function formatMileage(input) {
+            let value = input.value.replace(/,/g, '').replace(/\D/g, '');
+            if (value.length > 6) value = value.slice(0, 6);
+            const formattedValue = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,'); // Format with commas
+            input.value = formattedValue;
+        }
+
         // Müşteri Verilerini Kaydetme
         document.getElementById('customerForm').addEventListener('submit', function (event) {
             event.preventDefault();
@@ -173,7 +181,7 @@
             }
 
             const carPlate = document.getElementById('carPlate').value; 
-            const mileage = document.getElementById('mileage').value;
+            const mileage = document.getElementById('mileage').value.replace(/,/g, ''); // Remove commas for storage
             const maintenanceOptions = selectedOptions.map(option => option.value);
             const additionalDetails = document.getElementById('additionalDetails').value;
 
@@ -208,30 +216,23 @@
             const resultDiv = document.getElementById('searchResult');
 
             if (searchPlate.trim() === '') {
-                resultDiv.innerText = 'Lütfen arama için araç plakasını girin.';
+                resultDiv.innerText = 'Lütfen geçerli bir araç plakasını girin.';
+                resultDiv.classList.remove('hidden'); 
                 return;
             }
 
             database.ref('customers').orderByChild('plate').equalTo(searchPlate).once('value')
                 .then((snapshot) => {
-                    resultDiv.innerHTML = ''; 
+                    resultDiv.innerHTML = '';
                     if (snapshot.exists()) {
-                        const results = [];
                         snapshot.forEach(childSnapshot => {
                             const data = childSnapshot.val();
-                            results.push(data); // Push data to results array
-                        });
-
-                        // Sort results by date (latest first)
-                        results.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-                        results.forEach(data => {
+                            const formattedMileage = parseInt(data.mileage).toLocaleString('en-US', {minimumIntegerDigits: 6, useGrouping: true}); // Format mileage for display with leading zeros
                             const maintenanceList = data.maintenance.map(item => `<li>${item}</li>`).join('');
-
                             resultDiv.innerHTML += `
                                 <div>
                                     <p><strong>Araç Plakası:</strong> ${data.plate}</p>
-                                    <p><strong>Kilometre Sayısı:</strong> ${data.mileage}</p>
+                                    <p><strong>Kilometre Sayısı:</strong> ${formattedMileage}</p>
                                     <p><strong>Bakım Türleri:</strong></p>
                                     <ul>${maintenanceList}</ul>
                                     <p><strong>Ek Detaylar:</strong> ${data.details}</p>
