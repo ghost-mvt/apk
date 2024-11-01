@@ -62,6 +62,7 @@
             border-radius: 6px;
             cursor: pointer;
             transition: background-color 0.3s, transform 0.2s;
+            margin: 5px 0; /* Adding margin between buttons */
         }
 
         button:hover {
@@ -109,6 +110,7 @@
     <div class="container">
         <h1>Müşteri Verileri Kaydetme</h1>
         <button id="toggleFormButton">Veri Girişi Yap</button>
+        <button id="toggleSearchButton" class="hidden">Araç Plakasıyla Ara</button>
 
         <form id="customerForm" class="hidden">
             <input type="text" id="carPlate" placeholder="Araç Plakası" oninput="validateCarPlate(this)" required>
@@ -214,10 +216,16 @@
                 .then((snapshot) => {
                     resultDiv.innerHTML = ''; 
                     if (snapshot.exists()) {
+                        const results = [];
                         snapshot.forEach(childSnapshot => {
                             const data = childSnapshot.val();
-                            
-                            // إنشاء قائمة غير مرتبة للصيانة
+                            results.push(data); // Push data to results array
+                        });
+
+                        // Sort results by date (latest first)
+                        results.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                        results.forEach(data => {
                             const maintenanceList = data.maintenance.map(item => `<li>${item}</li>`).join('');
 
                             resultDiv.innerHTML += `
@@ -242,18 +250,32 @@
                 });
         });
 
-        // Form görünürlüğünü değiştirme
+        // Form ve arama görünürlüğünü değiştirme
         document.getElementById('toggleFormButton').addEventListener('click', function () {
             const form = document.getElementById('customerForm');
-            const searchInputs = document.querySelectorAll('#searchPlate, #searchButton, h2');
-            
-            if (form.classList.contains('hidden')) {
-                form.classList.remove('hidden');
-                searchInputs.forEach(element => element.classList.add('hidden'));
-            } else {
-                form.classList.add('hidden');
-                searchInputs.forEach(element => element.classList.remove('hidden'));
-            }
+            const searchHeading = document.querySelector('h2');
+            const searchInput = document.getElementById('searchPlate');
+            const searchButton = document.getElementById('searchButton');
+
+            form.classList.remove('hidden');
+            searchHeading.classList.add('hidden');
+            searchInput.classList.add('hidden');
+            searchButton.classList.add('hidden');
+            document.getElementById('toggleSearchButton').classList.remove('hidden');
+        });
+
+        document.getElementById('toggleSearchButton').addEventListener('click', function () {
+            const form = document.getElementById('customerForm');
+            const searchHeading = document.querySelector('h2');
+            const searchInput = document.getElementById('searchPlate');
+            const searchButton = document.getElementById('searchButton');
+
+            form.classList.add('hidden');
+            searchHeading.classList.remove('hidden');
+            searchInput.classList.remove('hidden');
+            searchButton.classList.remove('hidden');
+            document.getElementById('toggleSearchButton').classList.add('hidden');
+            document.getElementById('toggleFormButton').classList.remove('hidden');
         });
     </script>
 </body>
