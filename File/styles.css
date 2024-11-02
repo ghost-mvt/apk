@@ -1,44 +1,48 @@
 body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f5f5f5;
+    font-family: 'Helvetica', sans-serif;
+    background-color: #e0e0e0;
     margin: 0;
     padding: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
+    background-size: cover;
+    user-select: none;
 }
 
 .container {
-    width: 100%;
-    max-width: 500px;
-    background: #ffffff;
+    max-width: 100%;
+    margin: auto;
+    background: rgba(255, 255, 255, 0.9);
     padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 h1, h2 {
     text-align: center;
     color: #333;
-    margin-bottom: 20px;
-    font-weight: 700;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
 }
 
 input, select, textarea {
-    width: 100%;
-    padding: 10px;
+    width: 95%;
+    padding: 12px;
     margin: 10px 0;
-    border: 1px solid #ccc;
+    border: 1px solid #666;
     border-radius: 6px;
-    box-sizing: border-box;
-    transition: all 0.3s;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 input:focus, select:focus, textarea:focus {
     border-color: #007bff;
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
     outline: none;
+}
+
+select {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
 }
 
 button {
@@ -58,12 +62,10 @@ button:hover {
     transform: translateY(-2px);
 }
 
-#error {
-    color: red;
-}
-
-.hidden {
-    display: none;
+#message, #error {
+    text-align: center;
+    margin-top: 20px;
+    font-weight: bold;
 }
 
 #searchResult {
@@ -71,6 +73,7 @@ button:hover {
     padding: 10px;
     border-radius: 6px;
     background-color: #e9ecef;
+    overflow: auto;
 }
 
 #searchResult div {
@@ -78,4 +81,20 @@ button:hover {
     border-radius: 6px;
     padding: 10px;
     margin-bottom: 10px;
+}
+
+#searchResult p {
+    margin: 0;
+}
+
+.error {
+    color: red;
+}
+
+.hidden {
+    display: none;
+}
+
+#loginForm {
+    display: none; /* إخفاء نموذج تسجيل الدخول في البداية */
 }
