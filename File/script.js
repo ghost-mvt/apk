@@ -79,4 +79,69 @@ document.getElementById('customerForm').addEventListener('submit', function (eve
     const maintenanceOptions = selectedOptions.map(option => option.value);
     const additionalDetails = document.getElementById('additionalDetails').value;
 
-    const currentDate =
+    const currentDate = new Date().toLocaleDateString();
+
+    // Verileri Firebase'e kaydet
+    const newEntryRef = database.ref('customers').push();
+    newEntryRef.set({
+        carPlate: carPlate,
+        mileage: mileage,
+        maintenanceOptions: maintenanceOptions,
+        additionalDetails: additionalDetails,
+        date: currentDate
+    })
+    .then(() => {
+        document.getElementById('message').innerText = 'Veri başarıyla kaydedildi!';
+        document.getElementById('customerForm').reset();
+    })
+    .catch(error => {
+        console.error('Hata:', error);
+        document.getElementById('error').innerText = 'Veri kaydetme sırasında bir hata oluştu.';
+    });
+});
+
+// Araç Plakasıyla Arama
+document.getElementById('toggleSearchButton').addEventListener('click', function () {
+    const searchPlateInput = document.getElementById('searchPlate');
+    searchPlateInput.classList.toggle('hidden');
+    this.classList.toggle('hidden');
+    document.querySelector('h2.hidden').classList.toggle('hidden');
+    document.getElementById('searchResult').classList.add('hidden');
+});
+
+document.getElementById('searchButton').addEventListener('click', function () {
+    const searchPlate = document.getElementById('searchPlate').value.toUpperCase();
+    const searchResultDiv = document.getElementById('searchResult');
+
+    if (!searchPlate) {
+        alert('Lütfen bir plaka girin.');
+        return;
+    }
+
+    database.ref('customers').orderByChild('carPlate').equalTo(searchPlate).once('value')
+        .then(snapshot => {
+            searchResultDiv.innerHTML = '';
+            if (snapshot.exists()) {
+                snapshot.forEach(childSnapshot => {
+                    const data = childSnapshot.val();
+                    const resultDiv = document.createElement('div');
+                    resultDiv.innerHTML = `
+                        <strong>Plaka:</strong> ${data.carPlate}<br>
+                        <strong>KM:</strong> ${data.mileage}<br>
+                        <strong>Bakım Türleri:</strong> ${data.maintenanceOptions.join(', ')}<br>
+                        <strong>Ek Detaylar:</strong> ${data.additionalDetails || 'Yok'}<br>
+                        <strong>Tarih:</strong> ${data.date}
+                    `;
+                    searchResultDiv.appendChild(resultDiv);
+                });
+                searchResultDiv.classList.remove('hidden');
+            } else {
+                searchResultDiv.innerHTML = 'Bu plaka ile ilgili kayıt bulunamadı.';
+                searchResultDiv.classList.remove('hidden');
+            }
+        })
+        .catch(error => {
+            console.error('Hata:', error);
+            alert('Arama sırasında bir hata oluştu.');
+        });
+});
