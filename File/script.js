@@ -16,9 +16,9 @@ const database = firebase.database();
 
 // تحقق من حالة تسجيل الدخول
 if (!localStorage.getItem('loggedIn')) {
-    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('loginForm').style.display = 'block'; // عرض نموذج تسجيل الدخول
 } else {
-    document.getElementById('mainContent').classList.remove('hidden');
+    document.getElementById('mainContent').classList.remove('hidden'); // عرض المحتوى الرئيسي
 }
 
 // إدارة تسجيل الدخول
@@ -26,15 +26,16 @@ document.getElementById('loginButton').addEventListener('click', function () {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
+    // تحقق من بيانات المستخدم من Firebase Realtime Database
     database.ref('users').orderByChild('username').equalTo(username).once('value')
         .then(snapshot => {
             if (snapshot.exists()) {
                 const userData = snapshot.val();
-                const userKey = Object.keys(userData)[0];
+                const userKey = Object.keys(userData)[0]; // الحصول على المفتاح
                 if (userData[userKey].password === password) {
-                    localStorage.setItem('loggedIn', 'true');
-                    document.getElementById('loginForm').style.display = 'none';
-                    document.getElementById('mainContent').classList.remove('hidden');
+                    localStorage.setItem('loggedIn', 'true'); // حفظ حالة تسجيل الدخول
+                    document.getElementById('loginForm').style.display = 'none'; // إخفاء نموذج تسجيل الدخول
+                    document.getElementById('mainContent').classList.remove('hidden'); // عرض المحتوى الرئيسي
                 } else {
                     document.getElementById('loginError').innerText = 'Kullanıcı adı veya şifre hatalı.';
                 }
@@ -48,100 +49,88 @@ document.getElementById('loginButton').addEventListener('click', function () {
         });
 });
 
-// Araç plakasını doğrulama
+// Araç plakasını doğrulama و temizleme fonksiyonu
 function validateCarPlate(input) {
-    const regex = /[^A-Za-z0-9]/g;
-    input.value = input.value.replace(regex, '').toUpperCase();
+    const regex = /[^A-Za-z0-9]/g; 
+    input.value = input.value.replace(regex, '').toUpperCase(); 
 }
 
-// Kilometre formatlama
+// Kilometre formatlama fonksiyonu
 function formatMileage(input) {
     let value = input.value.replace(/,/g, '').replace(/\D/g, '');
     if (value.length > 6) value = value.slice(0, 6);
-    const formattedValue = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+    const formattedValue = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,'); 
     input.value = formattedValue;
 }
 
-// Müşteri Verilerini Kaydetme
+// Veri kaydetme işlemi
 document.getElementById('customerForm').addEventListener('submit', function (event) {
     event.preventDefault();
 
-    const selectedOptions = Array.from(document.getElementById('maintenanceOptions').selectedOptions);
-    if (selectedOptions.length === 0) {
-        document.getElementById('error').innerText = 'En az bir bakım türü seçmelisiniz.';
-        return;
-    } else {
-        document.getElementById('error').innerText = '';
-    }
-
     const carPlate = document.getElementById('carPlate').value;
-    const mileage = document.getElementById('mileage').value.replace(/,/g, '');
-    const maintenanceOptions = selectedOptions.map(option => option.value);
+    const mileage = document.getElementById('mileage').value;
+    const maintenanceOptions = Array.from(document.getElementById('maintenanceOptions').selectedOptions).map(option => option.value);
     const additionalDetails = document.getElementById('additionalDetails').value;
 
-    const currentDate = new Date().toLocaleDateString();
+    const newData = {
+        carPlate,
+        mileage,
+        maintenanceOptions,
+        additionalDetails,
+    };
 
-    // Verileri Firebase'e kaydet
-    const newEntryRef = database.ref('customers').push();
-    newEntryRef.set({
-        carPlate: carPlate,
-        mileage: mileage,
-        maintenanceOptions: maintenanceOptions,
-        additionalDetails: additionalDetails,
-        date: currentDate
-    })
-    .then(() => {
-        document.getElementById('message').innerText = 'Veri başarıyla kaydedildi!';
-        document.getElementById('customerForm').reset();
-    })
-    .catch(error => {
-        console.error('Hata:', error);
-        document.getElementById('error').innerText = 'Veri kaydetme sırasında bir hata oluştu.';
-    });
+    // Veriyi Firebase'e kaydetme
+    database.ref('customers/' + carPlate).set(newData)
+        .then(() => {
+            document.getElementById('message').innerText = 'Veri başarıyla kaydedildi.';
+            document.getElementById('customerForm').reset(); // Formu sıfırlama
+        })
+        .catch(error => {
+            console.error('Hata:', error);
+            document.getElementById('error').innerText = 'Veri kaydetme sırasında bir hata oluştu.';
+        });
 });
 
-// Araç Plakasıyla Arama
-document.getElementById('toggleSearchButton').addEventListener('click', function () {
-    const searchPlateInput = document.getElementById('searchPlate');
-    searchPlateInput.classList.toggle('hidden');
-    this.classList.toggle('hidden');
-    document.querySelector('h2.hidden').classList.toggle('hidden');
-    document.getElementById('searchResult').classList.add('hidden');
-});
-
+// Araç plakasını arama
 document.getElementById('searchButton').addEventListener('click', function () {
-    const searchPlate = document.getElementById('searchPlate').value.toUpperCase();
-    const searchResultDiv = document.getElementById('searchResult');
+    const searchPlate = document.getElementById('searchPlate').value;
 
-    if (!searchPlate) {
-        alert('Lütfen bir plaka girin.');
-        return;
-    }
-
-    database.ref('customers').orderByChild('carPlate').equalTo(searchPlate).once('value')
+    // Veritabanında arama
+    database.ref('customers/' + searchPlate).once('value')
         .then(snapshot => {
-            searchResultDiv.innerHTML = '';
             if (snapshot.exists()) {
-                snapshot.forEach(childSnapshot => {
-                    const data = childSnapshot.val();
-                    const resultDiv = document.createElement('div');
-                    resultDiv.innerHTML = `
-                        <strong>Plaka:</strong> ${data.carPlate}<br>
-                        <strong>KM:</strong> ${data.mileage}<br>
-                        <strong>Bakım Türleri:</strong> ${data.maintenanceOptions.join(', ')}<br>
-                        <strong>Ek Detaylar:</strong> ${data.additionalDetails || 'Yok'}<br>
-                        <strong>Tarih:</strong> ${data.date}
-                    `;
-                    searchResultDiv.appendChild(resultDiv);
-                });
-                searchResultDiv.classList.remove('hidden');
+                const data = snapshot.val();
+                const resultDiv = document.getElementById('searchResult');
+                resultDiv.innerHTML = `
+                    <div>
+                        <p><strong>Plaka:</strong> ${data.carPlate}</p>
+                        <p><strong>KM:</strong> ${data.mileage}</p>
+                        <p><strong>Bakım Seçenekleri:</strong> ${data.maintenanceOptions.join(', ')}</p>
+                        <p><strong>Ek Detaylar:</strong> ${data.additionalDetails || 'Yok'}</p>
+                    </div>`;
+                resultDiv.classList.remove('hidden');
             } else {
-                searchResultDiv.innerHTML = 'Bu plaka ile ilgili kayıt bulunamadı.';
-                searchResultDiv.classList.remove('hidden');
+                document.getElementById('searchResult').innerHTML = '<p>Bu plaka için veri bulunamadı.</p>';
             }
         })
         .catch(error => {
             console.error('Hata:', error);
-            alert('Arama sırasında bir hata oluştu.');
+            document.getElementById('searchResult').innerHTML = '<p>Arama sırasında bir hata oluştu.</p>';
         });
+});
+
+// Form geçişi ve arama görünürlüğü
+document.getElementById('toggleFormButton').addEventListener('click', function () {
+    const form = document.getElementById('customerForm');
+    const isVisible = !form.classList.contains('hidden');
+    form.classList.toggle('hidden', isVisible);
+    document.getElementById('toggleSearchButton').classList.toggle('hidden', !isVisible);
+});
+
+document.getElementById('toggleSearchButton').addEventListener('click', function () {
+    const searchSection = document.getElementById('searchPlate');
+    const isVisible = !searchSection.classList.contains('hidden');
+    searchSection.classList.toggle('hidden', isVisible);
+    document.querySelector('h2.hidden').classList.toggle('hidden', !isVisible);
+    document.getElementById('searchResult').classList.add('hidden'); // Önceki sonuçları gizle
 });
