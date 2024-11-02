@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title></title>
+    <title>Müşteri Verileri Kaydetme</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="File/styles.css">
 </head>
@@ -11,8 +11,9 @@
     <div class="container">
         <h1>𝕊𝕠𝕝𝕞𝕒𝕫 𝔸𝕦𝕥𝕠</h1>
         
+        <!-- نموذج تسجيل الدخول -->
         <div id="loginForm">
-            <h2></h2>
+            <h2>Giriş Yap</h2>
             <input type="text" id="username" placeholder="Kullanıcı Adı" required>
             <input type="password" id="password" placeholder="Şifre" required>
             <button id="loginButton">Giriş Yap</button>
@@ -23,6 +24,7 @@
             <button id="toggleFormButton">Veri Girişi Yap</button>
             <button id="toggleSearchButton" class="hidden">Araç Plakasıyla Ara</button>
 
+            <!-- Form for Data Entry -->
             <form id="customerForm" class="hidden">
                 <input type="text" id="carPlate" placeholder="Plaka" oninput="validateCarPlate(this)" required>
                 <input type="text" id="mileage" placeholder="KM" oninput="formatMileage(this)" required>
@@ -41,6 +43,7 @@
             <div id="message"></div>
             <div id="error" class="error"></div>
 
+            <!-- Search Section -->
             <h2 class="hidden">Araç Plakasıyla Ara</h2>
             <input type="text" id="searchPlate" class="hidden" placeholder="Araç plakasını girin" oninput="validateCarPlate(this)">
             <button id="searchButton" class="hidden">Ara</button>
