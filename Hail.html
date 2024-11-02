@@ -114,8 +114,8 @@
 
         <!-- Form for Data Entry -->
         <form id="customerForm" class="hidden">
-            <input type="text" id="carPlate" placeholder="Araç Plakası" oninput="validateCarPlate(this)" required>
-            <input type="text" id="mileage" placeholder="Kilometre Sayısı (00,000 veya 000,000)" oninput="formatMileage(this)" required>
+            <input type="text" id="carPlate" placeholder="Plaka" oninput="validateCarPlate(this)" required>
+            <input type="text" id="mileage" placeholder="KM" oninput="formatMileage(this)" required>
             <select id="maintenanceOptions" multiple required>
                 <option value="Motor Yağı">Motor Yağı</option>
                 <option value="Yağ Filtresi">Yağ Filtresi</option>
@@ -242,12 +242,12 @@
                             const maintenanceList = data.maintenance.map(item => `<li>${item}</li>`).join('');
                             resultDiv.innerHTML += `
                                 <div>
-                                    <p><strong>Araç Plakası:</strong> ${data.plate}</p>
-                                    <p><strong>Kilometre Sayısı:</strong> ${formattedMileage}</p>
-                                    <p><strong>Bakım Türleri:</strong></p>
+                                    <p><strong>Plaka:</strong> ${data.plate}</p>
+                                    <p><strong>KM:</strong> ${formattedMileage}</p>
+                                    <p><strong>Bakım:</strong></p>
                                     <ul>${maintenanceList}</ul>
-                                    <p><strong>Ek Detaylar:</strong> ${data.details}</p>
-                                    <p><strong>Kayıt Tarihi:</strong> ${data.date}</p>
+                                    <p><strong>Detaylar:</strong> ${data.details}</p>
+                                    <p><strong>Tarihi:</strong> ${data.date}</p>
                                 </div>
                             `;
                         });
