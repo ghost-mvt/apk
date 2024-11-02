@@ -62,7 +62,7 @@
             border-radius: 6px;
             cursor: pointer;
             transition: background-color 0.3s, transform 0.2s;
-            margin: 5px 0; /* Adding margin between buttons */
+            margin: 5px 0;
         }
 
         button:hover {
@@ -112,6 +112,7 @@
         <button id="toggleFormButton">Veri Girişi Yap</button>
         <button id="toggleSearchButton" class="hidden">Araç Plakasıyla Ara</button>
 
+        <!-- Form for Data Entry -->
         <form id="customerForm" class="hidden">
             <input type="text" id="carPlate" placeholder="Araç Plakası" oninput="validateCarPlate(this)" required>
             <input type="text" id="mileage" placeholder="Kilometre Sayısı (00,000 veya 000,000)" oninput="formatMileage(this)" required>
@@ -130,6 +131,7 @@
         <div id="message"></div>
         <div id="error" class="error"></div>
 
+        <!-- Search Section -->
         <h2 class="hidden">Araç Plakasıyla Ara</h2>
         <input type="text" id="searchPlate" class="hidden" placeholder="Araç plakasını girin" oninput="validateCarPlate(this)">
         <button id="searchButton" class="hidden">Ara</button>
@@ -228,7 +230,7 @@
                         const results = [];
                         snapshot.forEach(childSnapshot => {
                             const data = childSnapshot.val();
-                            results.push(data); // Add the data to the results array
+                            results.push(data);
                         });
 
                         // Sort results by date (newest first)
@@ -236,7 +238,7 @@
 
                         // Display results
                         results.forEach(data => {
-                            const formattedMileage = parseInt(data.mileage).toLocaleString('en-US', {minimumIntegerDigits: 6, useGrouping: true}); // Format mileage for display with leading zeros
+                            const formattedMileage = parseInt(data.mileage).toLocaleString('en-US', {minimumIntegerDigits: 6, useGrouping: true});
                             const maintenanceList = data.maintenance.map(item => `<li>${item}</li>`).join('');
                             resultDiv.innerHTML += `
                                 <div>
@@ -264,13 +266,18 @@
         document.getElementById('toggleFormButton').addEventListener('click', function() {
             document.getElementById('customerForm').classList.toggle('hidden');
             document.getElementById('toggleSearchButton').classList.toggle('hidden');
+            document.getElementById('searchPlate').classList.add('hidden');
+            document.getElementById('searchButton').classList.add('hidden');
+            document.querySelector('h2').classList.add('hidden');
+            document.getElementById('searchResult').classList.add('hidden');
         });
 
         document.getElementById('toggleSearchButton').addEventListener('click', function() {
             document.getElementById('searchPlate').classList.toggle('hidden');
             document.getElementById('searchButton').classList.toggle('hidden');
             document.querySelector('h2').classList.toggle('hidden');
-            document.getElementById('searchResult').classList.toggle('hidden');
+            document.getElementById('searchResult').classList.add('hidden');
+            document.getElementById('customerForm').classList.add('hidden');
         });
     </script>
 </body>
