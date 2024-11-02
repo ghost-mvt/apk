@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Müşteri Verileri Kaydetme</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>𝕊𝕠𝕝𝕞𝕒𝕫 𝔸𝕦𝕥𝕠</h1>
+        
+        <div id="loginForm">
+            <h2>Giriş Yap</h2>
+            <input type="text" id="username" placeholder="Kullanıcı Adı" required>
+            <input type="password" id="password" placeholder="Şifre" required>
+            <button id="loginButton">Giriş Yap</button>
+            <div id="loginError" class="error"></div>
+        </div>
+
+        <div id="mainContent" class="hidden">
+            <button id="toggleFormButton">Veri Girişi Yap</button>
+            <button id="toggleSearchButton" class="hidden">Araç Plakasıyla Ara</button>
+
+            <form id="customerForm" class="hidden">
+                <input type="text" id="carPlate" placeholder="Plaka" oninput="validateCarPlate(this)" required>
+                <input type="text" id="mileage" placeholder="KM" oninput="formatMileage(this)" required>
+                <select id="maintenanceOptions" multiple required>
+                    <option value="Motor Yağı">Motor Yağı</option>
+                    <option value="Yağ Filtresi">Yağ Filtresi</option>
+                    <option value="Hava Filtresi">Hava Filtresi</option>
+                    <option value="Dizel Filtresi">Dizel Filtresi</option>
+                    <option value="Polen Filtresi">Polen Filtresi</option>
+                    <option value="Diğer">Diğer</option>
+                </select>
+                <textarea id="additionalDetails" placeholder="Ek Detaylar (isteğe bağlı)"></textarea>
+                <button type="submit">Verileri Kaydet</button>
+            </form>
+
+            <div id="message"></div>
+            <div id="error" class="error"></div>
+
+            <h2 class="hidden">Araç Plakasıyla Ara</h2>
+            <input type="text" id="searchPlate" class="hidden" placeholder="Araç plakasını girin" oninput="validateCarPlate(this)">
+            <button id="searchButton" class="hidden">Ara</button>
+
+            <div id="searchResult" class="hidden"></div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
