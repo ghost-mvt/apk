@@ -225,8 +225,17 @@
                 .then((snapshot) => {
                     resultDiv.innerHTML = '';
                     if (snapshot.exists()) {
+                        const results = [];
                         snapshot.forEach(childSnapshot => {
                             const data = childSnapshot.val();
+                            results.push(data); // Add the data to the results array
+                        });
+
+                        // Sort results by date (newest first)
+                        results.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                        // Display results
+                        results.forEach(data => {
                             const formattedMileage = parseInt(data.mileage).toLocaleString('en-US', {minimumIntegerDigits: 6, useGrouping: true}); // Format mileage for display with leading zeros
                             const maintenanceList = data.maintenance.map(item => `<li>${item}</li>`).join('');
                             resultDiv.innerHTML += `
@@ -251,32 +260,17 @@
                 });
         });
 
-        // Form ve arama görünürlüğünü değiştirme
-        document.getElementById('toggleFormButton').addEventListener('click', function () {
-            const form = document.getElementById('customerForm');
-            const searchHeading = document.querySelector('h2');
-            const searchInput = document.getElementById('searchPlate');
-            const searchButton = document.getElementById('searchButton');
-
-            form.classList.remove('hidden');
-            searchHeading.classList.add('hidden');
-            searchInput.classList.add('hidden');
-            searchButton.classList.add('hidden');
-            document.getElementById('toggleSearchButton').classList.remove('hidden');
+        // Form ve arama butonları için görünürlük değiştirme
+        document.getElementById('toggleFormButton').addEventListener('click', function() {
+            document.getElementById('customerForm').classList.toggle('hidden');
+            document.getElementById('toggleSearchButton').classList.toggle('hidden');
         });
 
-        document.getElementById('toggleSearchButton').addEventListener('click', function () {
-            const form = document.getElementById('customerForm');
-            const searchHeading = document.querySelector('h2');
-            const searchInput = document.getElementById('searchPlate');
-            const searchButton = document.getElementById('searchButton');
-
-            form.classList.add('hidden');
-            searchHeading.classList.remove('hidden');
-            searchInput.classList.remove('hidden');
-            searchButton.classList.remove('hidden');
-            document.getElementById('toggleSearchButton').classList.add('hidden');
-            document.getElementById('toggleFormButton').classList.remove('hidden');
+        document.getElementById('toggleSearchButton').addEventListener('click', function() {
+            document.getElementById('searchPlate').classList.toggle('hidden');
+            document.getElementById('searchButton').classList.toggle('hidden');
+            document.querySelector('h2').classList.toggle('hidden');
+            document.getElementById('searchResult').classList.toggle('hidden');
         });
     </script>
 </body>
