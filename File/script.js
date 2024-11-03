@@ -122,15 +122,20 @@ document.getElementById('searchButton').addEventListener('click', function () {
 // Form geçişi ve arama görünürlüğü
 document.getElementById('toggleFormButton').addEventListener('click', function () {
     const form = document.getElementById('customerForm');
+    const searchElements = [document.getElementById('searchPlate'), document.getElementById('searchButton'), document.querySelector('h2.hidden')];
     const isVisible = !form.classList.contains('hidden');
+
     form.classList.toggle('hidden', isVisible);
+    searchElements.forEach(element => element.classList.add('hidden'));
+
     document.getElementById('toggleSearchButton').classList.toggle('hidden', !isVisible);
 });
 
 document.getElementById('toggleSearchButton').addEventListener('click', function () {
-    const searchSection = document.getElementById('searchPlate');
-    const isVisible = !searchSection.classList.contains('hidden');
-    searchSection.classList.toggle('hidden', isVisible);
-    document.querySelector('h2.hidden').classList.toggle('hidden', !isVisible);
-    document.getElementById('searchResult').classList.add('hidden'); // Önceki sonuçları gizle
+    const searchElements = [document.getElementById('searchPlate'), document.getElementById('searchButton'), document.querySelector('h2.hidden')];
+    const isVisible = !searchElements[0].classList.contains('hidden');
+
+    searchElements.forEach(element => element.classList.toggle('hidden', isVisible));
+    document.getElementById('customerForm').classList.add('hidden'); // إخفاء نموذج الإدخال عند عرض البحث
+    document.getElementById('searchResult').classList.add('hidden'); // إخفاء النتائج السابقة
 });
