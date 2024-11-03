@@ -5,55 +5,312 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Müşteri Verileri Kaydetme</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="File/styles.css">
+    <style>
+        body {
+            font-family: 'Helvetica', sans-serif;
+            background-color: #e0e0e0;
+            margin: 0;
+            padding: 20px;
+            background-size: cover;
+            user-select: none;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        input, select, textarea {
+            width: 95%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #666;
+            border-radius: 6px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+            outline: none;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin: 5px 0;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        #message, #error {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        #searchResult {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 6px;
+            background-color: #e9ecef;
+            overflow: auto;
+        }
+
+        #searchResult div {
+            border: 3px solid #007bff;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        #searchResult p {
+            margin: 0;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
 </head>
 <body>
     <div class="container">
         <h1>𝕊𝕠𝕝𝕞𝕒𝕫 𝔸𝕦𝕥𝕠</h1>
-        
-        <!-- نموذج تسجيل الدخول -->
-        <div id="loginForm">
+
+        <!-- Login Form -->
+        <div id="loginForm" class="hidden">
             <h2>Giriş Yap</h2>
-            <input type="text" id="username" placeholder="Kullanıcı Adı" required>
+            <input type="email" id="email" placeholder="E-posta" required>
             <input type="password" id="password" placeholder="Şifre" required>
             <button id="loginButton">Giriş Yap</button>
-            <div id="loginError" class="error"></div>
+            <div id="loginError" class="error hidden"></div>
         </div>
 
-        <div id="mainContent" class="hidden">
-            <button id="toggleFormButton">Veri Girişi Yap</button>
-            <button id="toggleSearchButton" class="hidden">Araç Plakasıyla Ara</button>
+        <button id="toggleSearchButton" class="hidden">Araç Plakasıyla Ara</button>
 
-            <!-- Form for Data Entry -->
-            <form id="customerForm" class="hidden">
-                <input type="text" id="carPlate" placeholder="Plaka" oninput="validateCarPlate(this)" required>
-                <input type="text" id="mileage" placeholder="KM" oninput="formatMileage(this)" required>
-                <select id="maintenanceOptions" multiple required>
-                    <option value="Motor Yağı">Motor Yağı</option>
-                    <option value="Yağ Filtresi">Yağ Filtresi</option>
-                    <option value="Hava Filtresi">Hava Filtresi</option>
-                    <option value="Dizel Filtresi">Dizel Filtresi</option>
-                    <option value="Polen Filtresi">Polen Filtresi</option>
-                    <option value="Diğer">Diğer</option>
-                </select>
-                <textarea id="additionalDetails" placeholder="Ek Detaylar (isteğe bağlı)"></textarea>
-                <button type="submit">Verileri Kaydet</button>
-            </form>
+        <!-- Form for Data Entry -->
+        <form id="customerForm" class="hidden">
+            <input type="text" id="carPlate" placeholder="Plaka" oninput="validateCarPlate(this)" required>
+            <input type="text" id="mileage" placeholder="KM" oninput="formatMileage(this)" required>
+            <select id="maintenanceOptions" multiple required>
+                <option value="Motor Yağı">Motor Yağı</option>
+                <option value="Yağ Filtresi">Yağ Filtresi</option>
+                <option value="Hava Filtresi">Hava Filtresi</option>
+                <option value="Dizel Filtresi">Dizel Filtresi</option>
+                <option value="Polen Filtresi">Polen Filtresi</option>
+                <option value="Diğer">Diğer</option>
+            </select>
+            <textarea id="additionalDetails" placeholder="Ek Detaylar (isteğe bağlı)"></textarea>
+            <button type="submit">Verileri Kaydet</button>
+        </form>
 
-            <div id="message"></div>
-            <div id="error" class="error"></div>
+        <div id="message"></div>
+        <div id="error" class="error"></div>
 
-            <!-- Search Section -->
-            <h2 class="hidden">Araç Plakasıyla Ara</h2>
-            <input type="text" id="searchPlate" class="hidden" placeholder="Araç plakasını girin" oninput="validateCarPlate(this)">
-            <button id="searchButton" class="hidden">Ara</button>
+        <!-- Search Section -->
+        <h2 class="hidden">Araç Plakasıyla Ara</h2>
+        <input type="text" id="searchPlate" class="hidden" placeholder="Araç plakasını girin" oninput="validateCarPlate(this)">
+        <button id="searchButton" class="hidden">Ara</button>
 
-            <div id="searchResult" class="hidden"></div>
-        </div>
+        <div id="searchResult" class="hidden"></div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-database.js"></script>
-    <script src="File/script.js"></script>
+    <script>
+        // Firebase Ayarları
+        const firebaseConfig = {
+            apiKey: "AIzaSyBqvh9YjugTcuGGP1hKJjfo5FiRpy1fJFE",
+            authDomain: "ghost-54304.firebaseapp.com",
+            databaseURL: "https://ghost-54304-default-rtdb.firebaseio.com",
+            projectId: "ghost-54304",
+            storageBucket: "ghost-54304.appspot.com",
+            messagingSenderId: "882897642019",
+            appId: "1:882897642019:web:a4e544d9c8faf735d80796",
+            measurementId: "G-2Y2TRT9XCF"
+        };
+
+        // Uygulamayı Başlat
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // Sayfa Yüklendiğinde Kontrol Et
+        window.onload = function () {
+            const user = localStorage.getItem('user');
+            if (user) {
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('toggleSearchButton').classList.remove('hidden');
+                document.getElementById('customerForm').classList.remove('hidden');
+            } else {
+                document.getElementById('loginForm').classList.remove('hidden');
+            }
+        };
+
+        // Giriş yapma fonksiyonu
+        document.getElementById('loginButton').addEventListener('click', function () {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    localStorage.setItem('user', email); // Save user email in localStorage
+                    document.getElementById('loginForm').classList.add('hidden');
+                    document.getElementById('toggleSearchButton').classList.remove('hidden');
+                    document.getElementById('customerForm').classList.remove('hidden');
+                })
+                .catch((error) => {
+                    document.getElementById('loginError').innerText = 'Hata: ' + error.message;
+                    document.getElementById('loginError').classList.remove('hidden');
+                });
+        });
+
+        // Araç plakasını doğrulama و temizleme fonksiyonu
+        function validateCarPlate(input) {
+            const regex = /[^A-Za-z0-9]/g; 
+            input.value = input.value.replace(regex, '').toUpperCase(); 
+        }
+
+        // Kilometre formatlama fonksiyonu
+        function formatMileage(input) {
+            let value = input.value.replace(/,/g, '').replace(/\D/g, '');
+            if (value.length > 6) value = value.slice(0, 6);
+            const formattedValue = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,'); // Format with commas
+            input.value = formattedValue;
+        }
+
+        // Müşteri Verilerini Kaydetme
+        document.getElementById('customerForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const carPlate = document.getElementById('carPlate').value.toUpperCase();
+            const mileage = document.getElementById('mileage').value.replace(/,/g, '');
+            const maintenanceOptions = Array.from(document.getElementById('maintenanceOptions').selectedOptions).map(option => option.value);
+            const additionalDetails = document.getElementById('additionalDetails').value;
+
+            const currentDate = new Date();
+            const formattedDate = currentDate.toLocaleDateString('en-CA', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            }).replace(/-/g, '/');
+
+            const customerData = {
+                plate: carPlate,
+                mileage: mileage,
+                maintenance: maintenanceOptions,
+                details: additionalDetails,
+                date: formattedDate
+            };
+
+            database.ref('customers').push(customerData)
+                .then(() => {
+                    document.getElementById('message').innerText = 'Veriler başarıyla kaydedildi!';
+                    document.getElementById('customerForm').reset();
+                })
+                .catch((error) => {
+                    document.getElementById('message').innerText = 'Hata oluştu: ' + error.message;
+                });
+        });
+
+        // Araç plakasıyla arama yapma
+        document.getElementById('searchButton').addEventListener('click', function () {
+            const searchPlate = document.getElementById('searchPlate').value.toUpperCase(); 
+            const resultDiv = document.getElementById('searchResult');
+
+            if (searchPlate.trim() === '') {
+                resultDiv.innerText = 'Lütfen geçerli bir araç plakasını girin.';
+                resultDiv.classList.remove('hidden'); 
+                return;
+            }
+
+            database.ref('customers').orderByChild('plate').equalTo(searchPlate).once('value')
+                .then((snapshot) => {
+                    resultDiv.innerHTML = '';
+                    if (snapshot.exists()) {
+                        const results = [];
+                        snapshot.forEach(childSnapshot => {
+                            const data = childSnapshot.val();
+                            results.push(data);
+                        });
+
+                        // Sonuçları tarihe göre sıralama (en yenisi önce)
+                        results.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                        // Sonuçları görüntüleme
+                        results.forEach(data => {
+                            const formattedMileage = parseInt(data.mileage).toLocaleString('en-US', {minimumIntegerDigits: 6, useGrouping: true});
+                            const maintenanceList = data.maintenance.map(item => `<li>${item}</li>`).join('');
+                            resultDiv.innerHTML += `
+                                <div>
+                                    <p><strong>Plaka:</strong> ${data.plate}</p>
+                                    <p><strong>KM:</strong> ${formattedMileage}</p>
+                                    <p><strong>Bakım:</strong></p>
+                                    <ul>${maintenanceList}</ul>
+                                    <p><strong>Detaylar:</strong> ${data.details}</p>
+                                    <p><strong>Tarihi:</strong> ${data.date}</p>
+                                </div>
+                            `;
+                        });
+                        resultDiv.classList.remove('hidden'); 
+                    } else {
+                        resultDiv.innerText = 'Bu numara ile veri bulunmamaktadır.';
+                        resultDiv.classList.remove('hidden'); 
+                    }
+                })
+                .catch((error) => {
+                    resultDiv.innerText = 'Hata oluştu: ' + error.message;
+                });
+        });
+
+        // Form ve arama butonları için görünürlük değiştirme
+        document.getElementById('toggleSearchButton').addEventListener('click', function() {
+            document.getElementById('searchPlate').classList.toggle('hidden');
+            document.getElementById('searchButton').classList.toggle('hidden');
+            document.querySelector('h2').classList.toggle('hidden');
+            document.getElementById('searchResult').classList.add('hidden');
+
+            // Hide the customer form when searching
+            document.getElementById('customerForm').classList.toggle('hidden');
+        });
+
+        // Çıkış yapma fonksiyonu
+        function logout() {
+            localStorage.removeItem('user'); // Clear user data from localStorage
+            location.reload(); // Reload the page to reflect the changes
+        }
+    </script>
 </body>
 </html>
