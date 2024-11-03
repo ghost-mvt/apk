@@ -109,11 +109,10 @@
 <body>
     <div class="container">
         <h1>𝕊𝕠𝕝𝕞𝕒𝕫 𝔸𝕦𝕥𝕠</h1>
-        <button id="toggleFormButton">Veri Girişi Yap</button>
-        <button id="toggleSearchButton" class="hidden">Araç Plakasıyla Ara</button>
+        <button id="toggleSearchButton">Araç Plakasıyla Ara</button>
 
         <!-- Form for Data Entry -->
-        <form id="customerForm" class="hidden">
+        <form id="customerForm">
             <input type="text" id="carPlate" placeholder="Plaka" oninput="validateCarPlate(this)" required>
             <input type="text" id="mileage" placeholder="KM" oninput="formatMileage(this)" required>
             <select id="maintenanceOptions" multiple required>
@@ -263,21 +262,14 @@
         });
 
         // Form ve arama butonları için görünürlük değiştirme
-        document.getElementById('toggleFormButton').addEventListener('click', function() {
-            document.getElementById('customerForm').classList.toggle('hidden');
-            document.getElementById('toggleSearchButton').classList.toggle('hidden');
-            document.getElementById('searchPlate').classList.add('hidden');
-            document.getElementById('searchButton').classList.add('hidden');
-            document.querySelector('h2').classList.add('hidden');
-            document.getElementById('searchResult').classList.add('hidden');
-        });
-
         document.getElementById('toggleSearchButton').addEventListener('click', function() {
             document.getElementById('searchPlate').classList.toggle('hidden');
             document.getElementById('searchButton').classList.toggle('hidden');
             document.querySelector('h2').classList.toggle('hidden');
             document.getElementById('searchResult').classList.add('hidden');
-            document.getElementById('customerForm').classList.add('hidden');
+
+            // Hide the customer form when searching
+            document.getElementById('customerForm').classList.toggle('hidden');
         });
     </script>
 </body>
